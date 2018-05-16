@@ -26,12 +26,8 @@ import java.util.logging.Level;
 import org.compiere.model.I_AD_Ref_Table;
 import org.compiere.orm.*;
 import org.compiere.query.MQuery;
-import org.idempiere.common.util.CCache;
-import org.idempiere.common.util.CLogger;
-import org.idempiere.common.util.DB;
+import org.idempiere.common.util.*;
 import org.compiere.util.DisplayType;
-import org.idempiere.common.util.Env;
-import org.idempiere.common.util.Language;
 
 /**
  *  Create MLookups
@@ -980,6 +976,29 @@ public class MLookupFactory
 			list.add (ldc);
 		}
 		return list;
+	}
+
+	/**
+	 * Get Info for given table and ID.
+	 * This method calls {@link MLookupFactory#getLookup_TableDirEmbed(Language, String, String, String) to
+	 * generate the info string.
+	 * @param ctx context
+	 * @param tableName tablename
+	 * @param id record id
+	 * @param trxName
+	 * @return record description
+	 */
+	public static String getInfoString(Properties ctx, String tableName, int id, String trxName)
+	{
+		Language language = Env.getLanguage(ctx);
+		String sql = MLookupFactory.getLookup_TableDirEmbed(language, tableName+"_ID", "[?","?]")
+			.replace("[?.?]", "?");
+		String docInfo = DB.getSQLValueStringEx(trxName, sql, id);
+		if (Util.isEmpty(docInfo))
+		{
+			docInfo = "<"+tableName+":"+id+">";
+		}
+		return docInfo;
 	}
 
 }   //  MLookupFactory
